@@ -247,5 +247,5 @@ NYC Yellow Taxi Trip Records — January 2024
 
 ## Author
 
-**Spandan** — B.Tech CSE @ SRMIST
+**Spandan** — B.Tech CSE @ SRMIST  
 GitHub: [@Spandan-139](https://github.com/Spandan-139)
