@@ -1,0 +1,71 @@
+version: "3.9"
+
+services:
+  redis:
+    image: redis:alpine
+    container_name: feature-forge-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  feature-registry:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: feature-forge-registry
+    working_dir: /app
+    volumes:
+      - ../data:/app/data
+    ports:
+      - "8000:8000"
+    command: uvicorn src.feature_registry.api:app --host 0.0.0.0 --port 8000
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  serving:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: feature-forge-serving
+    working_dir: /app
+    volumes:
+      - ../data:/app/data
+      - ../mlruns:/app/mlruns
+      - ../mlartifacts:/app/mlartifacts
+    ports:
+      - "8001:8001"
+    environment:
+      - MLFLOW_TRACKING_URI=http://host.docker.internal:5000
+    command: uvicorn src.serving.api:app --host 0.0.0.0 --port 8001
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  monitoring:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: feature-forge-monitoring
+    working_dir: /app
+    volumes:
+      - ../data:/app/data
+    ports:
+      - "8501:8501"
+    command: streamlit run src/monitoring/dashboard.py --server.port 8501 --server.address 0.0.0.0
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  redis_data:

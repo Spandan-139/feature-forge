@@ -1,3 +1,4 @@
+import os
 import time
 import mlflow
 import mlflow.sklearn
@@ -7,7 +8,7 @@ from pydantic import BaseModel
 from loguru import logger
 from src.online_store.store import get_online_features
 
-mlflow.set_tracking_uri("http://localhost:5000")
+mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://localhost:5000"))
 
 app = FastAPI(title="Feature Forge Serving API", version="1.0.0")
 
@@ -52,7 +53,6 @@ def startup():
 def predict(request: PredictionRequest):
     start = time.time()
 
-    # Fetch features from online store (Redis)
     features = get_online_features(request.location_id, FEATURE_NAMES)
     if not features:
         raise HTTPException(
@@ -60,10 +60,8 @@ def predict(request: PredictionRequest):
             detail=f"No features found for location_id: {request.location_id}"
         )
 
-    # Build input vector
     X = np.array([[features[f] for f in FEATURE_NAMES]])
 
-    # Load model and predict
     model = load_production_model()
     prediction = model.predict(X)[0]
 
