@@ -2,7 +2,7 @@ import polars as pl
 import duckdb
 from pathlib import Path
 from loguru import logger
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 RAW_DATA_PATH = Path("data/raw/yellow_tripdata_2024-01.parquet")
 PROCESSED_PATH = Path("data/processed")
@@ -42,7 +42,7 @@ def compute_location_features(df: pl.DataFrame) -> pl.DataFrame:
         pl.col("trip_distance").count().alias("trip_count_7d"),
         pl.col("trip_duration_minutes").mean().alias("avg_trip_duration_minutes_7d"),
     ]).with_columns([
-        pl.lit(datetime.utcnow()).alias("feature_timestamp"),
+        pl.lit(datetime.now(timezone.utc)).alias("feature_timestamp"),
         pl.col("PULocationID").cast(pl.Utf8).alias("entity_id"),
         pl.lit("PULocationID").alias("entity_type"),
     ])

@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
 from loguru import logger
 from .database import get_connection, row_to_dict
@@ -70,7 +70,7 @@ def update_feature_status(name: str, status: str) -> Optional[dict]:
         UPDATE features
         SET status = ?, version = version + 1, updated_at = ?
         WHERE name = ?
-    """, (status, datetime.utcnow(), name))
+    """, (status, datetime.now(timezone.utc), name))
     conn.commit()
     conn.close()
     logger.info(f"Updated feature {name} status to {status}")
