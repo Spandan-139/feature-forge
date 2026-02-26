@@ -1,5 +1,8 @@
 # ⚡ Feature Forge
 
+[![Live Demo](https://img.shields.io/badge/🤗%20Live%20Demo-Feature%20Forge-blue)](https://huggingface.co/spaces/Spandan-139/feature-forge)
+[![CI](https://github.com/Spandan-139/feature-forge/actions/workflows/ci.yml/badge.svg)](https://github.com/Spandan-139/feature-forge/actions)
+
 A production-style ML Feature Store with offline/online serving, model registry, and real-time monitoring — built from scratch.
 
 Inspired by Uber's Michelangelo, Google's Feast, and Meta's FBLearner.
